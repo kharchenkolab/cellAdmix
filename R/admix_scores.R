@@ -43,7 +43,11 @@ estimate_cell_adjacency <- function(df.spatial, random.shift=1e-3, edge.max.mad=
     unique()
 
   # Add reverse edges
-  adj.df %<>% select(cell_e, cell_s, cte, cts) %>% set_colnames(colnames(adj.df)) %>% rbind(adj.df) %>% unique()
+  adj.df %<>%
+      select(cell_e, cell_s, cte, cts) %>%
+      rename(cell_s = cell_e, cell_e = cell_s, cts = cte, cte = cts) %>%
+      rbind(adj.df) %>%
+      unique()
 
   return(adj.df)
 }
