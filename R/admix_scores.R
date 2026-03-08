@@ -232,14 +232,18 @@ estimate_contamination_scores <- function(
 #'
 #' @inheritDotParams estimate_contamination_scores
 #' @export
-estimate_contamination_scores_seurat <- function(so.rna, so.spatial, cell.type.adj.mat, idents='cell_type', ...) {
+estimate_contamination_scores_seurat <- function(so.rna, so.spatial, cell.type.adj.mat, idents='cell_type', assay.rna=NULL, assay.spatial=NULL, ...) {
   if (!is.null(idents)) {
     Seurat::Idents(so.rna) <- idents
     Seurat::Idents(so.spatial) <- idents
   }
 
+  assay.rna <- if (!is.null(assay.rna)) assay.rna else Seurat::DefaultAssay(so.rna)
+  assay.spatial <- if (!is.null(assay.spatial)) assay.spatial else Seurat::DefaultAssay(so.spatial)
+  message("Using assay '", assay.rna, "' for so.rna and '", assay.spatial, "' for so.spatial")
   return(estimate_contamination_scores(
-    cm.rna=so.rna[['RNA']]$counts, cm.spatial=so.spatial[['RNA']]$counts,
+    cm.rna=so.rna[[assay.rna]]$counts,
+    cm.spatial=so.spatial[[assay.spatial]]$counts,
     annot.rna=Idents(so.rna), annot.spatial=Idents(so.spatial),
     cell.type.adj.mat=cell.type.adj.mat, ...
   ))
