@@ -2,12 +2,12 @@
 
 #' @export
 estimate_cell_adjacency <- function(df.spatial, random.shift=1e-3, edge.max.mad=4, n.cores=1) {
-  required.cols <- c('x', 'y', 'cell_type', 'cell')
+  required.cols <- c('x', 'y', 'celltype', 'cell')
   if (!all(required.cols %in% colnames(df.spatial))) {
     stop(paste0('Required columns: ', paste(required.cols, collapse=', ')))
   }
 
-  df.spatial %<>% filter(!is.na(cell_type))
+  df.spatial %<>% filter(!is.na(celltype))
 
   df.spatial$x %<>% {. + runif(length(.), -random.shift, random.shift)}
   df.spatial$y %<>% {. + runif(length(.), -random.shift, random.shift)}
@@ -26,7 +26,7 @@ estimate_cell_adjacency <- function(df.spatial, random.shift=1e-3, edge.max.mad=
     # Molecule-based edges
     adj.df <- data.frame(is=edges[,1], ie=edges[,2]) %>% mutate(
       xs=cdf$x[is], xe=cdf$x[ie], ys=cdf$y[is], ye=cdf$y[ie],
-      cts=cdf$cell_type[is], cte=cdf$cell_type[ie],
+      cts=cdf$celltype[is], cte=cdf$celltype[ie],
       cell_s=cdf$cell[is], cell_e=cdf$cell[ie]
     ) %>% select(-is, -ie)
 
@@ -232,7 +232,7 @@ estimate_contamination_scores <- function(
 #'
 #' @inheritDotParams estimate_contamination_scores
 #' @export
-estimate_contamination_scores_seurat <- function(so.rna, so.spatial, cell.type.adj.mat, idents='cell_type', ...) {
+estimate_contamination_scores_seurat <- function(so.rna, so.spatial, cell.type.adj.mat, idents='celltype', ...) {
   if (!is.null(idents)) {
     Seurat::Idents(so.rna) <- idents
     Seurat::Idents(so.spatial) <- idents
