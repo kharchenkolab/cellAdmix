@@ -200,8 +200,9 @@ run_knn_nmf <- function(df, k=5, h=20, mols.test=NULL, nmol.dsamp=NULL, n.cores=
   cells <- df %>% count(cell) %>% filter(n > h) %>% pull(cell)
   df <- df[df$cell %in% cells,]
   genes <- unique(df$gene) %>% sort()
-  X <- get_knn_counts_all(df, h=h, include_i=TRUE, n.cores=n.cores) %>%
-    {as.matrix(.[, genes])}
+  N <- get_knn_counts_all(df, h=h, include_i=TRUE, n.cores=n.cores)
+  rownames(N) <- N$id
+  X <- as.matrix(N[, genes])
 
   # limit to only mols_test
   if (!is.null(mols.test)) {
@@ -322,6 +323,7 @@ project_nmf <- function(df, res, nmf.h, n.cores=1) {
     nnls::nnls(H, new.gene)$x
   }
 
+  rownames(df) <- df$mol_id
   mol.res <- res@fit@W # factor scores
   mols.tested <- rownames(mol.res)
 
