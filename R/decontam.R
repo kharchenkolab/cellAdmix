@@ -395,7 +395,6 @@ run_crf_all <- function(
     normalize.by=c('gene', 'factor', 'gene.factor'), proj.h=NULL, n.cores=1
   ) {
   normalize.by <- match.arg(normalize.by)
-  rownames(df) <- df$mol_id
 
   ### if only hvgs are used, then need to project all genes onto NMF to get their loadings
   if (res$gene_sub) {
@@ -442,8 +441,7 @@ run_crf_all <- function(
     bind_rows()
 
   # reordering to match cell order of df
-  rownames(crf.res) <- crf.res$id
-  crf.res <- crf.res[rownames(df),]
+  crf.res <- crf.res[match(df$mol_id, crf.res$id), ]
   crf.res <- crf.res[, 'factor', drop=FALSE]
 
   return(crf.res)
